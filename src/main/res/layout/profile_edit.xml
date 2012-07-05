@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:scrollbarStyle="outsideOverlay"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1.0"
+    >
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <!--name-->
+        <TextView android:text="Name"
+            style="@style/ProfileLabelHeader"
+            />
+        <EditText android:id="@+id/profile_name_edit"
+            android:hint="Profile name"
+            style="@style/ProfileEdit"
+            />
+        <!--Host-->
+        <TextView android:text="Host"
+            style="@style/ProfileLabelHeader"
+            />
+        <EditText android:id="@+id/host_edit"
+            android:hint="SSH Host"
+            style="@style/ProfileEdit"
+            />
+        <!--User-->
+        <TextView android:text="User"
+            style="@style/ProfileLabelHeader"
+            />
+        <EditText android:id="@+id/user_edit"
+            android:hint="SSH Username"
+            style="@style/ProfileEdit"
+            />
+        <!--Port-->
+        <TextView android:text="Port"
+            style="@style/ProfileLabelHeader"
+            />
+        <EditText android:id="@+id/port_edit"
+            android:hint="SSH Port"
+            android:inputType="number"
+            android:text="22"
+            style="@style/ProfileEdit"
+            />
+        <!--Command-->
+        <TextView android:text="Command"
+            style="@style/ProfileLabelHeader"
+            />
+        <EditText android:id="@+id/command_edit"
+            android:hint="Command"
+            style="@style/ProfileEdit"
+            />
+        <!--Password-->
+        <TextView android:text="Password"
+            style="@style/ProfileLabelHeader"
+            />
+        <EditText android:id="@+id/password_edit"
+            android:hint="Password"
+            android:inputType="textPassword"
+            style="@style/ProfileEdit"
+            />
+        <LinearLayout
+            android:orientation="vertical"
+            style="@style/EndButtonsContainer"
+            >
+            <Button android:id="@+id/button_cancel"
+                android:text="Cancel"
+                style="@style/EndButtons"
+                />
+            <Button android:id="@+id/button_save"
+                android:text="Save"
+                style="@style/EndButtons"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

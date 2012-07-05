@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:scrollbarStyle="outsideOverlay"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1.0"
+    >
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <!--Name-->
+        <TextView android:text="Name"
+            style="@style/ProfileLabelHeader"
+            />
+        <TextView 
+            style="@style/ProfileText"
+            android:id="@+id/profile_name_view"/>
+        <!--Host-->
+        <TextView android:text="Host"
+            style="@style/ProfileLabelHeader"
+            />
+        <TextView android:id="@+id/host_view"
+            style="@style/ProfileText"
+            />
+        <!--User-->
+        <TextView android:text="User"
+            style="@style/ProfileLabelHeader"
+            />
+        <TextView android:id="@+id/user_view"
+            style="@style/ProfileText"
+            />
+        <!--Port-->
+        <TextView android:text="Port"
+            style="@style/ProfileLabelHeader"
+            />
+        <TextView android:id="@+id/port_view"
+            style="@style/ProfileText"
+            />
+        <!--Command-->
+        <TextView android:text="Command"
+            style="@style/ProfileLabelHeader"
+            />
+        <TextView android:id="@+id/command_view"
+            style="@style/ProfileText"
+            />
+        <!--Password-->
+        <TextView android:text="Password"
+            style="@style/ProfileLabelHeader"
+            />
+        <TextView android:id="@+id/password_view"
+            style="@style/ProfileText"
+            android:textStyle="italic"
+            />
+        <!--Buttons-->
+        <LinearLayout
+            android:orientation="vertical"
+            style="@style/EndButtonsContainer"
+            >
+            <Button android:id="@+id/button_edit"
+                android:text="Edit"
+                style="@style/EndButtons"
+                />
+            <Button android:id="@+id/button_launch"
+                android:text="Run"
+                style="@style/EndButtons"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

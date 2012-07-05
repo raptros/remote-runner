@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ProfileText" parent="@android:style/TextAppearance.Medium">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:gravity">center_vertical|left</item>
+    </style>
+    <style name="ProfileLabelHeader" parent="@android:style/TextAppearance.Small">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/holo_blue_light</item>
+        <item name="android:background">@drawable/bar_below</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+    <style name="ProfileEdit" parent="@style/ProfileText">
+    </style>
+    <style name="EndButtonsContainer">
+        <item name="android:layout_gravity">right</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="EndButtons" parent="@android:style/TextAppearance.Medium">
+        <item name="android:gravity">center_vertical|left</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+</resources>
