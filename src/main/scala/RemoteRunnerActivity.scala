@@ -13,15 +13,18 @@ import java.util.UUID
 import android.util.Log
 
 @EnhanceStrings
-class RemoteRunnerActivity extends Activity with TypedActivity {
+class RemoteRunnerActivity extends Activity with TypedActivity with FragmentManager.OnBackStackChangedListener {
   lazy val keys = new Keys(getContentResolver)
   lazy val profiles = new Profiles(getContentResolver)
 
-  override def onCreate(bundle: Bundle) {
-    super.onCreate(bundle)
-    //setContentView(R.layout.main)
-    Log.d(TAG, "about to do initial fragment transaction")
-    doFragTrans (_.replace(android.R.id.content, new ProfilesListFragment))
+  override def onCreate(sis:Bundle) {
+    super.onCreate(sis)
+    getFragmentManager.addOnBackStackChangedListener(this)
+    setContentView(R.layout.main)
+    Option(sis) ifNone {
+      Log.d(TAG, "about to do initial fragment transaction")
+      doFragTrans (_.replace(R.id.primary_area, new ProfilesListFragment))
+    }
   }
 
   override def onCreateOptionsMenu(menu:Menu):Boolean = {
@@ -29,17 +32,15 @@ class RemoteRunnerActivity extends Activity with TypedActivity {
     true
   }
 
-
   def doFragTrans(f:(FragmentTransaction => Unit)):Unit = {
     val trans = getFragmentManager.beginTransaction()
     f(trans)
     trans.commit()
   }
 
-
   private val menuDispatch:PartialFunction[Int, Unit] = {
     case android.R.id.home => goBack()
-    case R.id.menu_add_profile => profileNew()
+    case R.id.menu_profile_add => profileNew()
   }
   override def onOptionsItemSelected(item:MenuItem) = (menuDispatch lift item.getItemId) ? true | super.onOptionsItemSelected(item)
 
@@ -47,20 +48,22 @@ class RemoteRunnerActivity extends Activity with TypedActivity {
 
   def profileView(id:Long):Unit = {
     Log.d(TAG, "entering profile #id")
-    val already = getFragmentManager.findFragmentById(android.R.id.content)
     doFragTrans {
-      _.replace(android.R.id.content, ProfileFragment(id))
-      .addToBackStack(null)
+      _.replace(R.id.primary_area, ProfileFragment(id))
+      .addToBackStack(PROFILE_VIEW)
     }
   }
 
   def profileNew():Unit = {
     Log.d(TAG, "creating new profile")
-    val already = getFragmentManager.findFragmentById(android.R.id.content)
     doFragTrans {
-      _.replace(android.R.id.content, EditProfileFragment(None))
-      .addToBackStack(null)
+      _.replace(R.id.primary_area, EditProfileFragment(None))
+      .addToBackStack(PROFILE_EDIT)
     }
+  }
+
+  def onBackStackChanged() = {
+    getActionBar.setDisplayHomeAsUpEnabled(getFragmentManager.getBackStackEntryCount > 0)
   }
 
 /*

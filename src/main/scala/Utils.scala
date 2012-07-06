@@ -33,11 +33,9 @@ trait FragTrans {
 trait ProfileView extends FragTrans {
   def profileView(id:Long):Unit = {
     Log.d(TAG, "entering profile #id")
-    val already = getActivity.getFragmentManager.findFragmentById(android.R.id.content)
     doFragTrans {
-      _.replace(android.R.id.content, ProfileFragment(id))
-      .addToBackStack(null)
+      _.replace(R.id.primary_area, ProfileFragment(id))
+      .addToBackStack(PROFILE_VIEW)
     }
   }
 }
-

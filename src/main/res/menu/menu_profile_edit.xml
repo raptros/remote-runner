@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_profile_edit_save"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="Save"
+        android:menuCategory="system"
+        android:orderInCategory="9"
+        android:showAsAction="ifRoom|withText"
+        />
+    <item android:id="@+id/menu_profile_edit_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="Delete"
+        android:menuCategory="system"
+        android:orderInCategory="11"
+        android:showAsAction="ifRoom|withText"
+        />
+</menu>
+

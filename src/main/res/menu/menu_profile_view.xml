@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_profile_launch"
+        android:icon="@android:drawable/ic_media_play"
+        android:title="Run"
+        android:menuCategory="system"
+        android:orderInCategory="10"
+        android:showAsAction="ifRoom|withText"
+        />
+    <item android:id="@+id/menu_profile_edit"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Edit"
+        android:menuCategory="system"
+        android:orderInCategory="11"
+        android:showAsAction="ifRoom|withText"
+        />
+</menu>
+

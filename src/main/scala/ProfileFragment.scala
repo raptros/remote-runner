@@ -18,15 +18,25 @@ import TypedResource._
 class ProfileFragment extends Fragment with OnClickMaker with FragTrans {
   lazy val profiles = new Profiles(getActivity.getContentResolver)
   lazy val keys = new Keys(getActivity.getContentResolver)
+  var profileId:Option[Long] = None
+
+  override def onSaveInstanceState(out:Bundle) = {
+    super.onSaveInstanceState(out)
+    profileId foreach {
+      id => out.putLong(kProfileId, id)
+    }
+  }
+  /** extract the profileID arg, either from sis or argument. */
+  override def onCreate(sis:Bundle) = {
+    super.onCreate(sis)
+    profileId = (sis oLong kProfileId) orElse (getArguments oLong kProfileId)
+  }
 
   override def onCreateView(inflater:LayoutInflater, container:ViewGroup, sis:Bundle) = {
     val view = inflater.inflate(R.layout.profile_display, null)
+    setHasOptionsMenu(true)
     prepareView(view)
     view
-  }
-
-  def profileId:Option[Long] =  Option(getArguments) flatMap {
-    (b:Bundle) => (b containsKey kProfileId) option (b getLong kProfileId)
   }
 
   /** sets up the view by extracting the profile, setting textfields, and addingcallbacks to buttons.*/
@@ -39,36 +49,45 @@ class ProfileFragment extends Fragment with OnClickMaker with FragTrans {
     view.findView(TR.password_view).setText {
       profile.password ? "<hidden>" | "<none>"
     }
-    handle1(view.findView(TR.button_edit)) {
-      profileEdit(id, profile)
-    }
-    handle1(view.findView(TR.button_launch)) {
-      profileLaunch(id, profile)
-    }
   }
 
   /** internal callback to push into an editing fragment.*/
   def profileEdit(id:Long, profile:Profile) = {
     Log.d(TAG, "requested edit of profile #id")
-    val already = getActivity.getFragmentManager.findFragmentById(android.R.id.content)
     doFragTrans {
-      _.remove(already).add(android.R.id.content, EditProfileFragment(id.some))
-      .addToBackStack(null)
+      _.replace(R.id.primary_area, EditProfileFragment(id.some))
+      .addToBackStack(PROFILE_EDIT)
     }
   }
 
   def profileLaunch(id:Long, profile:Profile) = {
     Log.d(TAG, "requested launch of profile #id")
   }
+  
+  /** menu dispatcher */
+  private val menuDispatch:PartialFunction[Int, Unit] = {
+    case R.id.menu_profile_launch => for (id <- profileId; profile <- profiles get id) profileLaunch(id, profile)
+    case R.id.menu_profile_edit => for (id <- profileId; profile <- profiles get id) profileEdit(id, profile)
+  }
+
+  override def onOptionsItemSelected(item:MenuItem) = (menuDispatch lift item.getItemId) ? true | super.onOptionsItemSelected(item)
+
+  /** menu! */
+  override def onCreateOptionsMenu(menu:Menu, mi:MenuInflater) =  mi.inflate(R.menu.menu_profile_view, menu)
+
 }
 
 /** companion object for setting up a profilefragment with an arguments bundle. */
 object ProfileFragment {
-  def apply(id:Long) = {
+  def mkArg(id:Long):Bundle = {
     val bundle = new Bundle
     bundle.putLong(kProfileId, id)
+    bundle
+  }
+
+  def apply(id:Long) = {
     val frag = new ProfileFragment
-    frag.setArguments(bundle)
+    frag.setArguments(mkArg(id))
     frag
   }
 }
@@ -79,19 +98,24 @@ class EditProfileFragment extends Fragment with OnClickMaker with ProfileView {
   lazy val profiles = new Profiles(getActivity.getContentResolver)
   lazy val keys = new Keys(getActivity.getContentResolver)
 
-  def getArg(arg:String):Option[Long] =  Option(getArguments) flatMap {
-    (b:Bundle) => (b containsKey arg) option (b getLong arg)
+  var fromProfileId:Option[Long] = None
+
+  override def onSaveInstanceState(out:Bundle) = {
+    super.onSaveInstanceState(out)
+    fromProfileId foreach {
+      id => out.putLong(kFromProfileId, id)
+    }
+  }
+
+  override def onCreate(sis:Bundle) = {
+    super.onCreate(sis)
+    fromProfileId = (sis oLong kFromProfileId) orElse (getArguments oLong kFromProfileId)
   }
 
   override def onCreateView(inflater:LayoutInflater, container:ViewGroup, sis:Bundle) = {
     val view = inflater.inflate(R.layout.profile_edit, null)
-    handle1(view.findView(TR.button_cancel)) {
-      profileEditCancel(getArg(kFromProfileId))
-    }
-    handle1(view.findView(TR.button_save)) {
-      profileEditSave(getProfile(view), getArg(kFromProfileId))
-    }
-    getArg(kFromProfileId) flatMap(profiles get _) foreach(setProfile(view, _))
+    setHasOptionsMenu(true)
+    fromProfileId flatMap(profiles get _) foreach(setProfile(view, _))
     view
   }
 
@@ -130,15 +154,29 @@ class EditProfileFragment extends Fragment with OnClickMaker with ProfileView {
     goBack()
     fromId ifNone (profileView(profiles.length - 1))
   }
+
+  /** menu dispatcher */
+  private val menuDispatch:PartialFunction[Int, Unit] = {
+    case R.id.menu_profile_edit_save => profileEditSave(getProfile(getView), fromProfileId)
+    case R.id.menu_profile_edit_delete => Log.d(TAG, "requested profile delete")
+  }
+
+  override def onOptionsItemSelected(item:MenuItem) = (menuDispatch lift item.getItemId) ? true | super.onOptionsItemSelected(item)
+
+  /** menu! */
+  override def onCreateOptionsMenu(menu:Menu, mi:MenuInflater) =  mi.inflate(R.menu.menu_profile_edit, menu)
 }
 
 /** companion object enables creation of an EditProfileFragment with arguments for target profile and optional profile to edit.*/
 object EditProfileFragment {
-  def apply(fromId:Option[Long]=None) = {
+  def mkArg(fromId:Option[Long]):Bundle = {
     val bundle = new Bundle
     fromId foreach (bundle.putLong(kFromProfileId, _))
+    bundle
+  }
+  def apply(fromId:Option[Long]=None) = {
     val frag = new EditProfileFragment
-    frag.setArguments(bundle)
+    frag.setArguments(mkArg(fromId))
     frag
   }
 }
