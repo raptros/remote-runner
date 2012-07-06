@@ -4,6 +4,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:gravity">center_vertical|left</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
     </style>
     <style name="ProfileLabelHeader" parent="@android:style/TextAppearance.Small">
         <item name="android:layout_height">wrap_content</item>
@@ -12,8 +14,13 @@
         <item name="android:textColor">@android:color/holo_blue_light</item>
         <item name="android:background">@drawable/bar_below</item>
         <item name="android:textAllCaps">true</item>
+        <item name="android:paddingLeft">8dp</item>
     </style>
     <style name="ProfileEdit" parent="@style/ProfileText">
+        <item name="android:layout_marginLeft">-4dp</item>
+        <item name="android:layout_marginRight">-4dp</item>
+        <item name="android:paddingLeft">11dp</item>
+        <item name="android:paddingRight">11dp</item>
     </style>
     <style name="EndButtonsContainer">
         <item name="android:layout_gravity">right</item>

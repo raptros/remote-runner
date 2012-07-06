@@ -20,7 +20,7 @@ case class Profile(
   password:Option[String]=None,
   keyId:Option[Long]=None) {
   def someName = name.isEmpty ? "#user@#host:#port $ #command" | name
-
+  override def toString = someName
 }
 
 class Profiles(resolver:ContentResolver) extends StorageResolver[Profile](resolver) {
@@ -54,7 +54,9 @@ class Profiles(resolver:ContentResolver) extends StorageResolver[Profile](resolv
 case class Key(
   privateKey:String,
   name:String="id_rsa",
-  password:Option[String]=None)
+  password:Option[String]=None) {
+  override def toString = name
+}
 
 class Keys(resolver:ContentResolver) extends StorageResolver[Key](resolver) {
   val table = "keys"
@@ -144,7 +146,7 @@ abstract class StorageResolver[A](val resolver:ContentResolver)(implicit manifes
       extract(wrapper).get
     }
   }
-  def iterator = new TableIterator
+  def iterator = (0 until length).toStream.flatMap(get(_)).toIterator
 
   def length = {
     val cursor = resolver.query(uri(table).buildUpon.appendPath("count").build(), null, null, null, null)
@@ -152,6 +154,8 @@ abstract class StorageResolver[A](val resolver:ContentResolver)(implicit manifes
     val count = cursor getInt 0
     cursor.close(); count
   }
+
+  def foreach[U](f:(A)=>U):Unit = iterator.foreach(f)
 
   def isEmpty = length == 0
 

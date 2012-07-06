@@ -19,6 +19,7 @@ class RemoteRunnerActivity extends Activity with TypedActivity with FragmentMana
 
   override def onCreate(sis:Bundle) {
     super.onCreate(sis)
+    getActionBar.setDisplayHomeAsUpEnabled(getFragmentManager.getBackStackEntryCount > 0)
     getFragmentManager.addOnBackStackChangedListener(this)
     setContentView(R.layout.main)
     Option(sis) ifNone {

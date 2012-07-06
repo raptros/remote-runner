@@ -15,7 +15,7 @@ import TypedResource._
 
 /** Displays a profile, with buttons for edit and execute. */
 @EnhanceStrings
-class ProfileFragment extends Fragment with OnClickMaker with FragTrans {
+class ProfileFragment extends Fragment with OnClickMaker with ProfileEdit with ProfileLaunch {
   lazy val profiles = new Profiles(getActivity.getContentResolver)
   lazy val keys = new Keys(getActivity.getContentResolver)
   var profileId:Option[Long] = None
@@ -51,23 +51,11 @@ class ProfileFragment extends Fragment with OnClickMaker with FragTrans {
     }
   }
 
-  /** internal callback to push into an editing fragment.*/
-  def profileEdit(id:Long, profile:Profile) = {
-    Log.d(TAG, "requested edit of profile #id")
-    doFragTrans {
-      _.replace(R.id.primary_area, EditProfileFragment(id.some))
-      .addToBackStack(PROFILE_EDIT)
-    }
-  }
-
-  def profileLaunch(id:Long, profile:Profile) = {
-    Log.d(TAG, "requested launch of profile #id")
-  }
   
   /** menu dispatcher */
   private val menuDispatch:PartialFunction[Int, Unit] = {
-    case R.id.menu_profile_launch => for (id <- profileId; profile <- profiles get id) profileLaunch(id, profile)
-    case R.id.menu_profile_edit => for (id <- profileId; profile <- profiles get id) profileEdit(id, profile)
+    case R.id.menu_profile_launch => profileId |>| (profileLaunch(_))
+    case R.id.menu_profile_edit => profileId |>| (profileEdit(_))
   }
 
   override def onOptionsItemSelected(item:MenuItem) = (menuDispatch lift item.getItemId) ? true | super.onOptionsItemSelected(item)

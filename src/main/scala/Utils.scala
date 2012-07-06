@@ -39,3 +39,23 @@ trait ProfileView extends FragTrans {
     }
   }
 }
+
+@EnhanceStrings
+trait ProfileEdit extends FragTrans {
+  def profileEdit(id:Long) = {
+    Log.d(TAG, "requested edit of profile #id")
+    doFragTrans {
+      _.replace(R.id.primary_area, EditProfileFragment(id.some))
+      .addToBackStack(PROFILE_EDIT)
+    }
+  }
+}
+
+@EnhanceStrings
+trait ProfileLaunch {
+  def profiles:Profiles
+  def keys:Keys
+  def profileLaunch(id:Long) = {
+    Log.d(TAG, "requested launch of profile #id")
+  }
+}
