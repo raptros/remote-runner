@@ -10,6 +10,7 @@ package object remoterunner {
   import Scalaz._
   val kProfileId = "profile_id"
   val kFromProfileId = "from_profile_id"
+  val kProfileArray = "profile_array"
 
   val TAG = "RemoteRunner"
 
@@ -34,6 +35,7 @@ package object remoterunner {
   class BundleWrapper(bundle:Bundle) {
     def oLong(key:String):Option[Long] = Option(bundle) flatMap (b => (b containsKey key) option (b getLong key))
     def oString(key:String):Option[String] = Option(bundle) flatMap (b => (b containsKey key) option (b getString key))
+    def oLongSeq(key:String):Option[Seq[Long]] = Option(bundle) flatMap (b => (b containsKey key) option (b getLongArray key)) map (_.toSeq)
   }
 
   implicit def bundle2BundleWrapper(bundle:Bundle) = new BundleWrapper(bundle)

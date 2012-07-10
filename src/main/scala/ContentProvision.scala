@@ -33,6 +33,13 @@ class RemoteRunnerProvider extends ContentProvider {
     whereAll <+> idClause <+> Option(selection) //first one that isn't None.
   }
   
+  def transaction[A](f: =>A):A = {
+    db.beginTransaction()
+    val a = f
+    db.endTransaction()
+    a
+  }
+  
   def query(uri:Uri, projection:Array[String], selection:String, selectionArgs:Array[String], sortOrder:String):Cursor = isCount(uri) ? getCount(uri) | {
     Log.d(TAG, "query: #{uri.toString}")
     val builder = new SQLiteQueryBuilder
@@ -51,8 +58,14 @@ class RemoteRunnerProvider extends ContentProvider {
   def update(uri:Uri, values:ContentValues, selection:String, selectionArgs:Array[String]):Int = db.update(table(uri), values, 
     where(uri, selection) getOrElse(null), selectionArgs)
 
-  def delete(uri:Uri, selection:String, selectionArgs:Array[String]) = db.delete(table(uri), 
-    where(uri, selection) getOrElse(null), selectionArgs)
+  def delete(uri:Uri, selection:String, selectionArgs:Array[String]) = transaction { 
+    Log.d(TAG, "deleting #uri")
+    val wh = where(uri, selection) getOrElse(null)
+    Log.d(TAG, "running where: #wh")
+    val count = db.delete(table(uri), wh, selectionArgs)
+    db.setTransactionSuccessful()
+    count
+  }
 
   def getType(uri:Uri) = "vnd.cursor." + (idGet(uri) ? "item" | "dir") + "/vnd.local.nodens.provider." + table(uri)
 

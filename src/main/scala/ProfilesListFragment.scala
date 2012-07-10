@@ -15,7 +15,7 @@ import TypedResource._
 
 /** Displays the list of profiles. */
 class ProfilesListFragment extends ListFragment 
-with ProfileView with ProfileEdit with ProfileLaunch 
+with ProfileView with ProfileEdit with ProfileLaunch with ProfileDelete
 with AbsListView.MultiChoiceModeListener {
 
   lazy val profiles = new Profiles(getActivity.getContentResolver)
@@ -46,11 +46,25 @@ with AbsListView.MultiChoiceModeListener {
     mode.invalidate()
   }
 
+  override def onStart() = {
+    super.onStart()
+    fixAdapter()
+  }
+  
+  override def onDeleteYes() = fixAdapter()
+
+  def fixAdapter() = {
+    val aa = getListAdapter.asInstanceOf[ArrayAdapter[Profile]]
+    aa.clear()
+    profiles foreach (aa.add(_))
+    getListView.invalidateViews()
+  }
+
   /** CAB dispatcher */
   private val cabDispatch:PartialFunction[Int, Unit] = {
     case R.id.menu_profile_cab_edit => checkedItems.headOption foreach (profileEdit(_))
     case R.id.menu_profile_cab_launch => checkedItems foreach (profileLaunch(_))
-    case R.id.menu_profile_cab_delete => { } //delete for all checked items
+    case R.id.menu_profile_cab_delete => { profileDelete(checkedItems) }
   }
 
   def onActionItemClicked(mode:ActionMode, item:MenuItem):Boolean = (cabDispatch lift item.getItemId) ? 

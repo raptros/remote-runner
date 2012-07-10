@@ -2,7 +2,7 @@ package local.nodens.remoterunner
 import scalaz._
 import Scalaz._
 
-import scala.collection.mutable.Buffer
+import scala.collection.mutable.{Buffer, ArrayBuffer}
 import scala.collection.JavaConversions._
 
 import android.database.Cursor
@@ -98,11 +98,21 @@ class CursorRow(cursor:Cursor) {
 abstract class StorageResolver[A](val resolver:ContentResolver)(implicit manifest:Manifest[A]) {
   import DBConsts._
   implicit def cursor2CursorRow(cursor:Cursor) = new CursorRow(cursor)
+
   def table:String
 
   def extract(row:CursorRow):Option[A]
 
   def prepare(a:A):ContentValues
+
+  def ids:ArrayBuffer[Long] = {
+    val ids = ArrayBuffer.empty[Long]
+    val cursor = resolver.query(uri(table), Array("#colId"), null, null, null)
+    cursor.moveToFirst()
+    while (!cursor.isAfterLast) {ids += cursor.getLong(0); cursor.moveToNext()}
+    cursor.close()
+    ids
+  }
 
   def +=(a:A) = {
     val vNew = prepare(a)
@@ -115,19 +125,19 @@ abstract class StorageResolver[A](val resolver:ContentResolver)(implicit manifes
 
   def update(idx:Long, a:A):Unit = {
     val vNew = prepare(a)
-    resolver.update(uriId(table, idx + 1), vNew, null, null)
+    resolver.update(uriId(table, ids(idx.toInt)), vNew, null, null)
   }
 
   def -=(idx:Long):Unit = {
-    resolver.delete(uriId(table, idx + 1), null, null)
-    this
+    val it = get(idx)
+    resolver.delete(uriId(table, ids(idx.toInt)), null, null)
   }
-  def apply(idx:Long):A = get(idx).get
+  def apply(idx:Long):A = get(idx.toInt).get
 
   def get(idx:Long):Option[A] = {
     //yes, we want all the columns
     Log.d(TAG, "fetching #idx from #table")
-    val cursor = resolver.query(uriId(table, idx + 1), null, null, null, null)
+    val cursor = resolver.query(uriId(table, ids(idx.toInt)), null, null, null, null)
     cursor.moveToFirst()
     val got = extract(cursor)
     Log.d(TAG, "got #got?[#it|nothing]")

@@ -82,7 +82,7 @@ object ProfileFragment {
 
 /** Enables editing of a profile. */
 @EnhanceStrings
-class EditProfileFragment extends Fragment with OnClickMaker with ProfileView {
+class EditProfileFragment extends Fragment with OnClickMaker with ProfileView with ProfileDelete {
   lazy val profiles = new Profiles(getActivity.getContentResolver)
   lazy val keys = new Keys(getActivity.getContentResolver)
 
@@ -103,8 +103,11 @@ class EditProfileFragment extends Fragment with OnClickMaker with ProfileView {
   override def onCreateView(inflater:LayoutInflater, container:ViewGroup, sis:Bundle) = {
     val view = inflater.inflate(R.layout.profile_edit, null)
     setHasOptionsMenu(true)
-    fromProfileId flatMap(profiles get _) foreach(setProfile(view, _))
     view
+  }
+  override def onStart() = {
+    super.onStart()
+    fromProfileId flatMap(profiles get _) foreach(setProfile(getView, _))
   }
 
   /** fills in the fields for modifying an existing profile. */
@@ -146,13 +149,16 @@ class EditProfileFragment extends Fragment with OnClickMaker with ProfileView {
   /** menu dispatcher */
   private val menuDispatch:PartialFunction[Int, Unit] = {
     case R.id.menu_profile_edit_save => profileEditSave(getProfile(getView), fromProfileId)
-    case R.id.menu_profile_edit_delete => Log.d(TAG, "requested profile delete")
+    case R.id.menu_profile_edit_delete => fromProfileId |>| (id => profileDelete(Seq(id)))
   }
 
   override def onOptionsItemSelected(item:MenuItem) = (menuDispatch lift item.getItemId) ? true | super.onOptionsItemSelected(item)
 
   /** menu! */
-  override def onCreateOptionsMenu(menu:Menu, mi:MenuInflater) =  mi.inflate(R.menu.menu_profile_edit, menu)
+  override def onCreateOptionsMenu(menu:Menu, mi:MenuInflater) = {
+    mi.inflate(R.menu.menu_profile_edit, menu)
+    fromProfileId ifNone (menu.removeItem(R.id.menu_profile_edit_delete))
+  }
 }
 
 /** companion object enables creation of an EditProfileFragment with arguments for target profile and optional profile to edit.*/
