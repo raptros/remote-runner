@@ -72,7 +72,7 @@ class Keys(resolver:ContentResolver) extends StorageResolver[Key](resolver) {
       case Key(privateKey, name, password) => {
         cv put ("privateKey", privateKey)
         cv put ("name", name)
-        password |>| (cv put ("password", _:String))
+        cv put ("password", password.getOrElse(null))
       }
     }; cv
   }

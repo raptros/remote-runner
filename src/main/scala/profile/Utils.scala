@@ -14,25 +14,6 @@ import scala.collection.mutable.{Publisher, Subscriber}
 
 import android.util.Log
 
-trait OnClickMaker {
-  def handle(button:Button)(handler:(View => Unit)):Unit = button.setOnClickListener(
-    new View.OnClickListener {
-      def onClick(v:View) = handler(v)
-    })
-
-  def handle1(button:Button)(handler: => Unit):Unit = handle(button)((v:View) => handler)
-}
-
-trait FragTrans {
-  def getActivity:Activity
-  def goBack():Unit = getActivity.getFragmentManager.popBackStack()
-  def doFragTrans(f:(FragmentTransaction => Unit)):Unit = {
-    val trans = getActivity.getFragmentManager.beginTransaction()
-    f(trans)
-    trans.commit()
-  }
-}
-
 //traits for fragments; these traits do things to profiles.
 
 @EnhanceStrings
@@ -52,6 +33,13 @@ trait ProfileEdit extends FragTrans {
     Log.d(TAG, "requested edit of profile #id")
     doFragTrans {
       _.replace(R.id.primary_area, EditProfileFragment(id.some))
+      .addToBackStack(PROFILE_EDIT)
+    }
+  }
+  def profileNew() = {
+    Log.d(TAG, "requested creation of new profile")
+    doFragTrans {
+      _.replace(R.id.primary_area, EditProfileFragment(None))
       .addToBackStack(PROFILE_EDIT)
     }
   }

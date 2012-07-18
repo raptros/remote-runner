@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_profile_add"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="Add"
+        android:menuCategory="system"
+        android:orderInCategory="12"
+        android:showAsAction="ifRoom|withText"/>
+    <item android:id="@+id/menu_key_list"
+        android:title="Keys"
+        android:menuCategory="system"
+        android:orderInCategory="13" />
+</menu>

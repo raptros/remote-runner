@@ -35,16 +35,27 @@ with AbsListView.MultiChoiceModeListener {
     val view = inflater.inflate(R.layout.profile_list, null).asInstanceOf[ListView]
     view.setMultiChoiceModeListener(this)
     view.setItemsCanFocus(true)
-    //view.setOnItemLongClickListener(this)
+    setHasOptionsMenu(true)
     view
   }
-  override def onListItemClick(l:ListView, v:View, pos:Int, id:Long) = {
-    profileView(id)
+
+  /** menu stuff. */
+  private val menuDispatch:PartialFunction[Int, Unit] = {
+    case R.id.menu_profile_add => profileNew()
+    case R.id.menu_key_list => doFragTrans {
+      _.replace(R.id.primary_area, new KeyListFragment)
+      .addToBackStack("keys")
+    }
+  }
+  override def onOptionsItemSelected(item:MenuItem) = (menuDispatch lift item.getItemId) ? true | super.onOptionsItemSelected(item)
+  override def onCreateOptionsMenu(menu:Menu, mi:MenuInflater) = {
+    mi.inflate(R.menu.menu_profiles_list, menu)
+    true
   }
 
-  def onItemCheckedStateChanged(mode:ActionMode, pos:Int, id:Long, checked:Boolean) = {
-    mode.invalidate()
-  }
+  override def onListItemClick(l:ListView, v:View, pos:Int, id:Long) = { profileView(id) }
+
+  def onItemCheckedStateChanged(mode:ActionMode, pos:Int, id:Long, checked:Boolean) = { mode.invalidate() }
 
   override def onStart() = {
     super.onStart()
@@ -91,32 +102,3 @@ with AbsListView.MultiChoiceModeListener {
   }
   
 }
-
-/** class for a layout that contains a checkbox. This allows it to implement checkable, 
-  * which is sufficient to allow the checkmark driven CAM, while also allowing the checkbox itself
-  * to be a clickable entry point.
-  */
-class MyCheckableView(context:Context, attrs:AttributeSet, defStyle:Int) extends LinearLayout(context, attrs, defStyle) with Checkable {
-  def this(context:Context, attrs:AttributeSet) = this(context, attrs, 0)
-  def this(context:Context) = this(context, null)
-  def button = this.findView(TR.profile_item_check_box)
-  def isChecked = button.isChecked
-  def setChecked(checked:Boolean) = button.setChecked(checked)
-  def toggle = button.toggle
-  
-  def notifyListView(lv:ListView, state:Boolean) = {
-    val pos = lv.getPositionForView(this)
-    lv.setItemChecked(pos, state)
-  }
-  override def onFinishInflate = {
-    super.onFinishInflate()
-    button.setOnCheckedChangeListener { 
-      new CompoundButton.OnCheckedChangeListener {
-        def onCheckedChanged(buttonVew:CompoundButton, state:Boolean) = getParent.isInstanceOf[ListView] when {
-          notifyListView(getParent.asInstanceOf[ListView], state)
-        }
-      }
-    }
-  }
-}
-
